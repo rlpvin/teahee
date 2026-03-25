@@ -39,4 +39,27 @@ class TeaCup {
       'mediaPaths': mediaPaths,
     };
   }
+
+  String get formattedTitle => _applyTypography(title);
+  String get formattedContent => _applyTypography(content);
+
+  String _applyTypography(String text) {
+    if (text.isEmpty) return text;
+
+    String result = text;
+
+    // 1. Convert -- to — (em-dash)
+    result = result.replaceAll('--', '—');
+
+    // 2. Convert " to smart quotes
+    // Replace opening quotes (start of line or after whitespace/newline)
+    result = result.replaceAllMapped(
+      RegExp(r'(^|[\s\n])"'),
+      (match) => '${match.group(1)}“',
+    );
+    // Replace remaining quotes with closing quotes
+    result = result.replaceAll('"', '”');
+
+    return result;
+  }
 }

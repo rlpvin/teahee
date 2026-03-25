@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
 import '../../models/teacup.dart';
 import '../../services/storage_service.dart';
@@ -127,6 +128,7 @@ class _EditScreenState extends State<EditScreen> {
                     children: [
                       TextFormField(
                         controller: _titleController,
+                        autofocus: widget.teacup == null,
                         decoration: const InputDecoration(
                           labelText: "Title",
                           border: OutlineInputBorder(),
@@ -141,14 +143,21 @@ class _EditScreenState extends State<EditScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _contentController,
+                        autofocus: widget.teacup != null,
                         minLines: 8,
                         maxLines: null,
                         textCapitalization: TextCapitalization.sentences,
+                        keyboardType: TextInputType.multiline,
+                        smartDashesType: SmartDashesType.enabled,
+                        smartQuotesType: SmartQuotesType.enabled,
+                        maxLength: 5000,
+                        maxLengthEnforcement: MaxLengthEnforcement.none,
                         decoration: const InputDecoration(
                           hintText: "Write your TeaCup...",
                           border: OutlineInputBorder(),
                           alignLabelWithHint: true,
                         ),
+                        onChanged: (value) => setState(() {}),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return "Please write some content";

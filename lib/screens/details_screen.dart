@@ -26,7 +26,7 @@ class DetailsScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-              Text(teacup.title, style: const TextStyle(fontSize: 22)),
+              Text(teacup.formattedTitle, style: const TextStyle(fontSize: 22)),
               const SizedBox(height: 8),
               Text(teacup.date),
               const SizedBox(height: 16),
@@ -39,7 +39,7 @@ class DetailsScreen extends StatelessWidget {
 
               if (teacup.mediaPaths.isNotEmpty) const SizedBox(height: 16),
 
-              Text(teacup.content),
+              Text(teacup.formattedContent),
 
                     ],
                   ),
