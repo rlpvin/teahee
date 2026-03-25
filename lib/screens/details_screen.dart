@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'edit/edit_tall_screen.dart';
-import 'edit/edit_grande_screen.dart';
-import 'edit/edit_venti_screen.dart';
+import 'edit_screen.dart';
 import '../theme/app_theme.dart';
 import '../models/teacup.dart';
 import '../services/storage_service.dart';
@@ -57,19 +55,16 @@ class DetailsScreen extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        Widget editScreen = EditTallScreen(teacup: teacup);
-                        if (teacup.type == "Grande") {
-                          editScreen = EditGrandeScreen(teacup: teacup);
-                        } else if (teacup.type == "Venti") {
-                          editScreen = EditVentiScreen(teacup: teacup);
-                        }
+                        Widget editScreen = EditScreen(teacup: teacup);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => editScreen,
                           ),
                         ).then((_) {
-                           Navigator.pop(context);
+                           if (context.mounted) {
+                             Navigator.pop(context);
+                           }
                         });
                       },
                       child: const Text("Edit"),

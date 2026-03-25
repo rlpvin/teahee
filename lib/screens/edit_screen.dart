@@ -4,24 +4,30 @@ import '../../models/teacup.dart';
 import '../../services/storage_service.dart';
 import 'package:uuid/uuid.dart';
 
-class EditTallScreen extends StatefulWidget {
+class EditScreen extends StatefulWidget {
   final TeaCup? teacup;
-  const EditTallScreen({super.key, this.teacup});
+  final String? initialType;
+
+  const EditScreen({super.key, this.teacup, this.initialType});
 
   @override
-  State<EditTallScreen> createState() => _EditTallScreenState();
+  State<EditScreen> createState() => _EditScreenState();
 }
 
-class _EditTallScreenState extends State<EditTallScreen> {
+class _EditScreenState extends State<EditScreen> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
   final StorageService _storageService = StorageService();
+  List<String> _mediaPaths = [];
+  late String _currentType;
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.teacup?.title ?? "");
     _contentController = TextEditingController(text: widget.teacup?.content ?? "");
+    _mediaPaths = widget.teacup?.mediaPaths.toList() ?? [];
+    _currentType = widget.teacup?.type ?? widget.initialType ?? "Tall";
   }
 
   @override
@@ -41,8 +47,8 @@ class _EditTallScreenState extends State<EditTallScreen> {
       title: title,
       content: content,
       date: widget.teacup?.date ?? DateTime.now().toLocal().toString().split(' ')[0],
-      type: "Tall",
-      mediaPaths: widget.teacup?.mediaPaths ?? [],
+      type: _currentType,
+      mediaPaths: _mediaPaths,
     );
 
     await _storageService.saveTeaCup(cup);
@@ -51,10 +57,20 @@ class _EditTallScreenState extends State<EditTallScreen> {
     }
   }
 
+  void _addMockMedia(String type) {
+    setState(() {
+      if (type == 'img') {
+        _mediaPaths.add('/mock_path/to_image_${_mediaPaths.length}.png');
+      } else {
+        _mediaPaths.add('/mock_path/to_${type}_${_mediaPaths.length}.$type');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.teacup == null ? "New Tall" : "Edit Tall")),
+      appBar: AppBar(title: Text(widget.teacup == null ? "New $_currentType" : "Edit $_currentType")),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -76,6 +92,41 @@ class _EditTallScreenState extends State<EditTallScreen> {
                   ),
                 ),
               ),
+              if (_currentType != "Tall" && _mediaPaths.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text("${_mediaPaths.length} media item(s)", style: const TextStyle(color: Colors.grey)),
+                ),
+              if (_currentType == "Grande")
+                ElevatedButton.icon(
+                  onPressed: () => _addMockMedia('img'),
+                  icon: const Icon(Icons.image),
+                  label: const Text("Add Image"),
+                ),
+              if (_currentType == "Venti")
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => _addMockMedia('img'),
+                      icon: const Icon(Icons.image),
+                      label: const Text("Image"),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      onPressed: () => _addMockMedia('aud'),
+                      icon: const Icon(Icons.mic),
+                      label: const Text("Audio"),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      onPressed: () => _addMockMedia('vid'),
+                      icon: const Icon(Icons.videocam),
+                      label: const Text("Video"),
+                    ),
+                  ],
+                ),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

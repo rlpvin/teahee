@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'edit/edit_tall_screen.dart';
-import 'edit/edit_grande_screen.dart';
-import 'edit/edit_venti_screen.dart';
+import 'edit_screen.dart';
 import '../theme/app_theme.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -72,7 +70,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const EditTallScreen()),
+                  MaterialPageRoute(builder: (_) => const EditScreen(initialType: "Tall")),
                 );
               },
             ),
@@ -84,7 +82,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const EditGrandeScreen()),
+                  MaterialPageRoute(builder: (_) => const EditScreen(initialType: "Grande")),
                 );
               },
             ),
@@ -96,7 +94,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const EditVentiScreen()),
+                  MaterialPageRoute(builder: (_) => const EditScreen(initialType: "Venti")),
                 );
               },
             ),
