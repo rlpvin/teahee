@@ -73,10 +73,32 @@ class DetailsScreen extends StatelessWidget {
                     child: ElevatedButton(
                       style: AppButtons.dangerButton,
                       onPressed: () async {
-                         await _storageService.deleteTeaCup(teacup.id);
-                         if (context.mounted) {
-                           Navigator.pop(context);
-                         }
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Delete TeaCup?"),
+                            content: const Text(
+                                "Are you sure you want to pour this TeaCup away? This cannot be undone."),
+                            actions: [
+                              OutlinedButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text("Cancel"),
+                              ),
+                              ElevatedButton(
+                                style: AppButtons.dangerButton,
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text("Delete"),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirmed == true) {
+                          await _storageService.deleteTeaCup(teacup.id);
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
+                        }
                       },
                       child: const Text("Delete"),
                     ),
