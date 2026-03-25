@@ -105,4 +105,83 @@ class StorageService {
       await file.delete();
     }
   }
+
+  Future<void> exportData(String destinationPath) async {
+    final rootDir = Directory('$destinationPath/TeaHee_Backup');
+    if (!await rootDir.exists()) {
+      await rootDir.create(recursive: true);
+    }
+
+    final mediaDir = Directory('${rootDir.path}/Media');
+    if (!await mediaDir.exists()) {
+      await mediaDir.create(recursive: true);
+    }
+
+    // Export JSONs
+    final localFolderPath = await _localPath;
+    final localDir = Directory(localFolderPath);
+    final entities = await localDir.list().toList();
+    for (var entity in entities) {
+      if (entity is File && entity.path.endsWith('.json')) {
+        final fileName = entity.path.split('/').last;
+        await entity.copy('${rootDir.path}/$fileName');
+      }
+    }
+
+    // Export Media
+    final localMediaFolderPath = await _mediaPath;
+    final localMediaDir = Directory(localMediaFolderPath);
+    final mediaEntities = await localMediaDir.list().toList();
+    for (var entity in mediaEntities) {
+      if (entity is File) {
+        final fileName = entity.path.split('/').last;
+        await entity.copy('${mediaDir.path}/$fileName');
+      }
+    }
+  }
+
+  Future<void> importData(String sourcePath) async {
+    final sourceDir = Directory(sourcePath);
+    final mediaSourceDir = Directory('$sourcePath/Media');
+    final internalMediaPath = await _mediaPath;
+    final internalStorePath = await _localPath;
+
+    final entities = await sourceDir.list().toList();
+    for (var entity in entities) {
+      if (entity is File && entity.path.endsWith('.json')) {
+        final contents = await entity.readAsString();
+        final Map<String, dynamic> jsonMap = jsonDecode(contents);
+        final cup = TeaCup.fromJson(jsonMap);
+
+        List<String> newMediaPaths = [];
+        for (var oldPath in cup.mediaPaths) {
+          final fileName = oldPath.split('/').last;
+          final sourceMediaFile = File('${mediaSourceDir.path}/$fileName');
+          
+          if (await sourceMediaFile.exists()) {
+            final destinationFile = File('$internalMediaPath/$fileName');
+            if (!await destinationFile.exists()) {
+              await sourceMediaFile.copy(destinationFile.path);
+            }
+            newMediaPaths.add(destinationFile.path);
+          } else {
+             // Fallback if media missing from backup but path was there
+             newMediaPaths.add(oldPath);
+          }
+        }
+
+        final updatedCup = TeaCup(
+          id: cup.id,
+          title: cup.title,
+          content: cup.content,
+          date: cup.date,
+          type: cup.type,
+          mediaPaths: newMediaPaths,
+        );
+
+        final localFile = File('$internalStorePath/${updatedCup.id}.json');
+        await localFile.writeAsString(jsonEncode(updatedCup.toJson()));
+      }
+    }
+  }
 }
