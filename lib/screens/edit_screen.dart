@@ -25,6 +25,7 @@ class _EditScreenState extends State<EditScreen> {
   final StorageService _storageService = StorageService();
   List<String> _mediaPaths = [];
   late String _currentType;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -43,9 +44,10 @@ class _EditScreenState extends State<EditScreen> {
   }
 
   Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
-    if (title.isEmpty || content.isEmpty) return;
 
     final cup = TeaCup(
       id: widget.teacup?.id ?? const Uuid().v4(),
@@ -115,24 +117,38 @@ class _EditScreenState extends State<EditScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              TextField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: "Title"),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: TextField(
-                  controller: _contentController,
-                  maxLines: null,
-                  expands: true,
-                  decoration: const InputDecoration(
-                    hintText: "Write your TeaCup...",
-                    border: OutlineInputBorder(),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(labelText: "Title"),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return "Please enter a title";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: TextFormField(
+                    controller: _contentController,
+                    maxLines: null,
+                    expands: true,
+                    decoration: const InputDecoration(
+                      hintText: "Write your TeaCup...",
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return "Please write some content";
+                      }
+                      return null;
+                    },
                   ),
                 ),
-              ),
               if (_currentType != "Tall" && _mediaPaths.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -236,6 +252,7 @@ class _EditScreenState extends State<EditScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
