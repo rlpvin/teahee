@@ -3,11 +3,15 @@ import 'edit/edit_tall_screen.dart';
 import 'edit/edit_grande_screen.dart';
 import 'edit/edit_venti_screen.dart';
 import '../theme/app_theme.dart';
+import '../models/teacup.dart';
+import '../services/storage_service.dart';
+import 'dart:io';
 
 class DetailsScreen extends StatelessWidget {
-  final String type;
+  final TeaCup teacup;
+  final StorageService _storageService = StorageService();
 
-  const DetailsScreen({super.key, required this.type});
+  DetailsScreen({super.key, required this.teacup});
 
   @override
   Widget build(BuildContext context) {
@@ -19,45 +23,54 @@ class DetailsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Beach Day", style: TextStyle(fontSize: 22)),
+              Text(teacup.title, style: const TextStyle(fontSize: 22)),
               const SizedBox(height: 8),
-              const Text("April 20, 2024"),
+              Text(teacup.date),
               const SizedBox(height: 16),
 
-              Container(
-                height: 150,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white),
+              if (teacup.mediaPaths.isNotEmpty)
+                Container(
+                  height: 150,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white),
+                  ),
+                  child: Image.file(
+                    File(teacup.mediaPaths.first),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => const Center(child: Text("Media")),
+                  ),
                 ),
-                child: const Center(child: Text("Photo")),
+
+              if (teacup.mediaPaths.isNotEmpty) const SizedBox(height: 16),
+
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Text(teacup.content),
+                ),
               ),
 
               const SizedBox(height: 16),
-
-              const Text(
-                "Spent the day at the beach, enjoyed the sun and waves...",
-              ),
-
-              const Spacer(),
 
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        Widget editScreen = const EditTallScreen();
-                        if (type == "Grande") {
-                          editScreen = const EditGrandeScreen();
-                        } else if (type == "Venti") {
-                          editScreen = const EditVentiScreen();
+                        Widget editScreen = EditTallScreen(teacup: teacup);
+                        if (teacup.type == "Grande") {
+                          editScreen = EditGrandeScreen(teacup: teacup);
+                        } else if (teacup.type == "Venti") {
+                          editScreen = EditVentiScreen(teacup: teacup);
                         }
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => editScreen,
                           ),
-                        );
+                        ).then((_) {
+                           Navigator.pop(context);
+                        });
                       },
                       child: const Text("Edit"),
                     ),
@@ -66,7 +79,12 @@ class DetailsScreen extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       style: AppButtons.dangerButton,
-                      onPressed: () {},
+                      onPressed: () async {
+                         await _storageService.deleteTeaCup(teacup.id);
+                         if (context.mounted) {
+                           Navigator.pop(context);
+                         }
+                      },
                       child: const Text("Delete"),
                     ),
                   ),
