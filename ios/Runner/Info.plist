@@ -66,5 +66,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to the photo library to add images and videos to TeaCups.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to the camera to take photos and videos for TeaCups.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires access to the microphone to record audio for TeaCups.</string>
 </dict>
 </plist>

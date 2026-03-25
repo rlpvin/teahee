@@ -3,7 +3,7 @@ import 'edit_screen.dart';
 import '../theme/app_theme.dart';
 import '../models/teacup.dart';
 import '../services/storage_service.dart';
-import 'dart:io';
+import '../widgets/media_preview.dart';
 
 class DetailsScreen extends StatelessWidget {
   final TeaCup teacup;
@@ -21,30 +21,28 @@ class DetailsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
               Text(teacup.title, style: const TextStyle(fontSize: 22)),
               const SizedBox(height: 8),
               Text(teacup.date),
               const SizedBox(height: 16),
 
               if (teacup.mediaPaths.isNotEmpty)
-                Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white),
-                  ),
-                  child: Image.file(
-                    File(teacup.mediaPaths.first),
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Center(child: Text("Media")),
-                  ),
+                SizedBox(
+                  height: 300,
+                  child: MediaPreviewList(mediaPaths: teacup.mediaPaths),
                 ),
 
               if (teacup.mediaPaths.isNotEmpty) const SizedBox(height: 16),
 
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Text(teacup.content),
+              Text(teacup.content),
+
+                    ],
+                  ),
                 ),
               ),
 
