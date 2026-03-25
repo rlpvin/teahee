@@ -12,15 +12,19 @@ class MediaPreviewList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = screenWidth - 32; // Assuming 16px padding on both sides in DetailsScreen
+
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: mediaPaths.length,
+      padding: EdgeInsets.zero,
       itemBuilder: (context, index) {
         final path = mediaPaths[index];
         return Padding(
-          padding: const EdgeInsets.only(right: 8.0),
+          padding: EdgeInsets.only(right: index == mediaPaths.length - 1 ? 0 : 8.0),
           child: SizedBox(
-            width: 300,
+            width: itemWidth,
             child: MediaPreviewItem(path: path),
           ),
         );
@@ -65,7 +69,7 @@ class MediaPreviewItem extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             MediaThumbnail(path: path),
-            if (isVideo || isAudio)
+            if (isVideo || isAudio || isImage)
               Positioned(
                 bottom: 8,
                 left: 8,
@@ -76,7 +80,7 @@ class MediaPreviewItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    isVideo ? "Video" : "Audio",
+                    isVideo ? "Video" : (isAudio ? "Audio" : "Image"),
                     style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ),

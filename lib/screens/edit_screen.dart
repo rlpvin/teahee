@@ -27,13 +27,21 @@ class _EditScreenState extends State<EditScreen> {
   List<String> _mediaPaths = [];
   late String _currentType;
   final _formKey = GlobalKey<FormState>();
+  final FocusNode _contentFocus = FocusNode();
+  late String _initialTitle;
+  late String _initialContent;
+  late List<String> _initialMedia;
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.teacup?.title ?? "");
-    _contentController = TextEditingController(text: widget.teacup?.content ?? "");
-    _mediaPaths = widget.teacup?.mediaPaths.toList() ?? [];
+    _initialTitle = widget.teacup?.title ?? "";
+    _initialContent = widget.teacup?.content ?? "";
+    _initialMedia = widget.teacup?.mediaPaths.toList() ?? [];
+    
+    _titleController = TextEditingController(text: _initialTitle);
+    _contentController = TextEditingController(text: _initialContent);
+    _mediaPaths = List<String>.from(_initialMedia);
     _currentType = widget.teacup?.type ?? widget.initialType ?? "Tall";
   }
 
@@ -41,7 +49,37 @@ class _EditScreenState extends State<EditScreen> {
   void dispose() {
     _titleController.dispose();
     _contentController.dispose();
+    _contentFocus.dispose();
     super.dispose();
+  }
+
+  bool _hasUnsavedChanges() {
+    final titleChanged = _titleController.text != _initialTitle;
+    final contentChanged = _contentController.text != _initialContent;
+    final mediaChanged = _mediaPaths.length != _initialMedia.length ||
+        !_mediaPaths.every((path) => _initialMedia.contains(path));
+    return titleChanged || contentChanged || mediaChanged;
+  }
+
+  Future<bool?> _showDiscardDialog() {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Discard Changes?"),
+        content: const Text("You have unsaved changes. Are you sure you want to discard them?"),
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Keep Editing"),
+          ),
+          ElevatedButton(
+            style: AppButtons.dangerButton,
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Discard"),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _save() async {
@@ -115,7 +153,21 @@ class _EditScreenState extends State<EditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.teacup == null ? "New $_currentType" : "Edit $_currentType")),
-      body: SafeArea(
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          final navigator = Navigator.of(context);
+          if (!_hasUnsavedChanges()) {
+            if (mounted) navigator.pop();
+            return;
+          }
+          final shouldPop = await _showDiscardDialog();
+          if (shouldPop == true && mounted) {
+            navigator.pop();
+          }
+        },
+        child: SafeArea(
         child: Column(
           children: [
             Expanded(
@@ -129,10 +181,16 @@ class _EditScreenState extends State<EditScreen> {
                       TextFormField(
                         controller: _titleController,
                         autofocus: widget.teacup == null,
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.next,
+                        spellCheckConfiguration: const SpellCheckConfiguration(),
                         decoration: const InputDecoration(
                           labelText: "Title",
                           border: OutlineInputBorder(),
                         ),
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(_contentFocus);
+                        },
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return "Please enter a title";
@@ -143,6 +201,7 @@ class _EditScreenState extends State<EditScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _contentController,
+                        focusNode: _contentFocus,
                         autofocus: widget.teacup != null,
                         minLines: 8,
                         maxLines: null,
@@ -308,6 +367,7 @@ class _EditScreenState extends State<EditScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
