@@ -115,144 +115,190 @@ class _EditScreenState extends State<EditScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.teacup == null ? "New $_currentType" : "Edit $_currentType")),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(labelText: "Title"),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return "Please enter a title";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: TextFormField(
-                    controller: _contentController,
-                    maxLines: null,
-                    expands: true,
-                    decoration: const InputDecoration(
-                      hintText: "Write your TeaCup...",
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return "Please write some content";
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              if (_currentType != "Tall" && _mediaPaths.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Form(
+                  key: _formKey,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text("${_mediaPaths.length} media item(s)", style: const TextStyle(color: Colors.grey)),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 100,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _mediaPaths.length,
-                          itemBuilder: (context, index) {
-                            final path = _mediaPaths[index];
-                            
-                            return Stack(
-                              children: [
-                                Container(
-                                  width: 100,
-                                  margin: const EdgeInsets.only(right: 8),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white24),
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: Colors.black12,
-                                  ),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: MediaThumbnail(path: path),
-                                ),
-                                Positioned(
-                                  top: 4,
-                                  right: 12,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _mediaPaths.remove(path);
-                                      });
-                                    },
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        color: Colors.black54,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(Icons.close, color: Colors.white, size: 20),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          labelText: "Title",
+                          border: OutlineInputBorder(),
                         ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Please enter a title";
+                          }
+                          return null;
+                        },
                       ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _contentController,
+                        minLines: 8,
+                        maxLines: null,
+                        textCapitalization: TextCapitalization.sentences,
+                        decoration: const InputDecoration(
+                          hintText: "Write your TeaCup...",
+                          border: OutlineInputBorder(),
+                          alignLabelWithHint: true,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Please write some content";
+                          }
+                          return null;
+                        },
+                      ),
+                      if (_currentType != "Tall" && _mediaPaths.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${_mediaPaths.length} media item(s)",
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                              ),
+                              const SizedBox(height: 8),
+                              SizedBox(
+                                height: 120,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: _mediaPaths.length,
+                                  itemBuilder: (context, index) {
+                                    final path = _mediaPaths[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Stack(
+                                        children: [
+                                          Container(
+                                            width: 100,
+                                            height: 100,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(color: Colors.white24),
+                                              borderRadius: BorderRadius.circular(8),
+                                              color: Colors.black12,
+                                            ),
+                                            clipBehavior: Clip.antiAlias,
+                                            child: MediaThumbnail(path: path),
+                                          ),
+                                          Positioned(
+                                            top: 0,
+                                            right: 0,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _mediaPaths.remove(path);
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(2),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.black54,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(Icons.close, color: Colors.white, size: 18),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (_currentType == "Grande")
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: ElevatedButton.icon(
+                            onPressed: _pickImage,
+                            icon: const Icon(Icons.image),
+                            label: const Text("Add Image"),
+                          ),
+                        ),
+                      if (_currentType == "Venti")
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            alignment: WrapAlignment.center,
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: _pickImage,
+                                icon: const Icon(Icons.image),
+                                label: const Text("Image"),
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: _pickAudio,
+                                icon: const Icon(Icons.mic),
+                                label: const Text("Audio"),
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: _pickVideo,
+                                icon: const Icon(Icons.videocam),
+                                label: const Text("Video"),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
-              if (_currentType == "Grande")
-                ElevatedButton.icon(
-                  onPressed: _pickImage,
-                  icon: const Icon(Icons.image),
-                  label: const Text("Add Image"),
-                ),
-              if (_currentType == "Venti")
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: _pickImage,
-                      icon: const Icon(Icons.image),
-                      label: const Text("Image"),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      onPressed: _pickAudio,
-                      icon: const Icon(Icons.mic),
-                      label: const Text("Audio"),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      onPressed: _pickVideo,
-                      icon: const Icon(Icons.videocam),
-                      label: const Text("Video"),
-                    ),
-                  ],
-                ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    style: AppButtons.saveButton,
-                    onPressed: _save,
-                    child: const Text("Save"),
-                  ),
-                  OutlinedButton(
-                    style: AppButtons.cancelButton,
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Cancel"),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
                   ),
                 ],
               ),
-            ],
-          ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: AppButtons.saveButton,
+                      onPressed: _save,
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Text("Save"),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: OutlinedButton(
+                      style: AppButtons.cancelButton,
+                      onPressed: () => Navigator.pop(context),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Text("Cancel"),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
