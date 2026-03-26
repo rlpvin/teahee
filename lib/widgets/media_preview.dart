@@ -72,16 +72,27 @@ class MediaPreviewItem extends StatelessWidget {
             if (isVideo || isAudio || isImage)
               Positioned(
                 bottom: 8,
-                left: 8,
+                right: 8,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text(
-                    isVideo ? "Video" : (isAudio ? "Audio" : "Image"),
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isVideo ? Icons.videocam : (isAudio ? Icons.audiotrack : Icons.image),
+                        color: Colors.white,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        isVideo ? "Video" : (isAudio ? "Audio" : "Image"),
+                        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
                 ),
               ),

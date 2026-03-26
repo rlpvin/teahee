@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import '../theme/app_theme.dart';
+import '../widgets/media_preview.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({super.key});
@@ -118,10 +119,53 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   Widget item(TeaCup teacup, BuildContext context) {
+    Widget leading;
+    if (teacup.mediaPaths.isNotEmpty) {
+      leading = Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: Colors.black12,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: MediaThumbnail(path: teacup.mediaPaths.first),
+      );
+    } else {
+      IconData iconData;
+      switch (teacup.type) {
+        case "Tall":
+          iconData = Icons.short_text;
+          break;
+        case "Grande":
+          iconData = Icons.image;
+          break;
+        case "Venti":
+          iconData = Icons.layers;
+          break;
+        default:
+          iconData = Icons.local_cafe;
+      }
+      leading = CircleAvatar(
+        backgroundColor: Colors.white10,
+        child: Icon(iconData, color: AppColors.accentGreen),
+      );
+    }
+
     return ListTile(
+      leading: leading,
       title: Text(teacup.title),
-      subtitle: Text(teacup.date),
-      trailing: Text(teacup.type),
+      subtitle: Row(
+        children: [
+          const Icon(Icons.calendar_today, size: 12, color: Colors.grey),
+          const SizedBox(width: 4),
+          Text(teacup.date, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        ],
+      ),
+      trailing: Text(
+        teacup.type,
+        style: const TextStyle(fontSize: 12, color: AppColors.accentGreen, fontWeight: FontWeight.bold),
+      ),
       onTap: () async {
         await Navigator.push(
           context,

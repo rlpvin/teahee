@@ -341,10 +341,11 @@ class _EditScreenState extends State<EditScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
                       style: AppButtons.saveButton,
                       onPressed: _save,
-                      child: const Padding(
+                      icon: const Icon(Icons.save),
+                      label: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12),
                         child: Text("Save"),
                       ),
@@ -352,10 +353,11 @@ class _EditScreenState extends State<EditScreen> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: OutlinedButton(
+                    child: OutlinedButton.icon(
                       style: AppButtons.cancelButton,
                       onPressed: () => Navigator.pop(context),
-                      child: const Padding(
+                      icon: const Icon(Icons.cancel),
+                      label: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12),
                         child: Text("Cancel"),
                       ),

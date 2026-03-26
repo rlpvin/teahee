@@ -28,7 +28,13 @@ class DetailsScreen extends StatelessWidget {
                     children: [
               Text(teacup.formattedTitle, style: const TextStyle(fontSize: 22)),
               const SizedBox(height: 8),
-              Text(teacup.date),
+              Row(
+                children: [
+                  const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                  const SizedBox(width: 8),
+                  Text(teacup.date, style: const TextStyle(color: Colors.grey)),
+                ],
+              ),
               const SizedBox(height: 16),
 
               if (teacup.mediaPaths.isNotEmpty)
@@ -51,7 +57,8 @@ class DetailsScreen extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.edit),
                       onPressed: () {
                         Widget editScreen = EditScreen(teacup: teacup);
                         Navigator.push(
@@ -65,13 +72,14 @@ class DetailsScreen extends StatelessWidget {
                            }
                         });
                       },
-                      child: const Text("Edit"),
+                      label: const Text("Edit"),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
                       style: AppButtons.dangerButton,
+                      icon: const Icon(Icons.delete),
                       onPressed: () async {
                         final confirmed = await showDialog<bool>(
                           context: context,
@@ -92,7 +100,7 @@ class DetailsScreen extends StatelessWidget {
                             ],
                           ),
                         );
-
+ 
                         if (confirmed == true) {
                           await _storageService.deleteTeaCup(teacup.id);
                           if (context.mounted) {
@@ -100,7 +108,7 @@ class DetailsScreen extends StatelessWidget {
                           }
                         }
                       },
-                      child: const Text("Delete"),
+                      label: const Text("Delete"),
                     ),
                   ),
                 ],

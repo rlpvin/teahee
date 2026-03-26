@@ -54,12 +54,19 @@ class HomeScreen extends StatelessWidget {
           children: [
             const Align(
               alignment: Alignment.center,
-              child: Text("Pour a TeaCup", style: TextStyle(fontSize: 22)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                   Icon(Icons.local_cafe, color: AppColors.accentGreen, size: 28),
+                   SizedBox(width: 12),
+                   Text("Pour a TeaCup", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             const Align(
               alignment: Alignment.center,
-              child: Text("Choose a Recipe:"),
+              child: Text("Choose a Recipe:", style: TextStyle(color: Colors.grey, letterSpacing: 1.2)),
             ),
             const SizedBox(height: 16),
 
