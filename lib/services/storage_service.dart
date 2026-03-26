@@ -8,8 +8,12 @@ class StorageService {
   static const String _folderName = 'TeaCups';
   static const String _mediaFolderName = 'TeaHeeMedia';
 
+  final Directory? testDirectory;
+
+  StorageService({this.testDirectory});
+
   Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = testDirectory ?? await getApplicationDocumentsDirectory();
     final path = '${directory.path}/$_folderName';
     final dir = Directory(path);
     if (!await dir.exists()) {
@@ -19,7 +23,7 @@ class StorageService {
   }
 
   Future<String> get _mediaPath async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = testDirectory ?? await getApplicationDocumentsDirectory();
     final path = '${directory.path}/$_mediaFolderName';
     final dir = Directory(path);
     if (!await dir.exists()) {
