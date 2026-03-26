@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'edit_screen.dart';
 import '../theme/app_theme.dart';
 
@@ -105,9 +106,98 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
+            const Expanded(child: SizedBox()),
+            const Center(child: SteamingCup()),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
+}
+
+class SteamingCup extends StatefulWidget {
+  const SteamingCup({super.key});
+
+  @override
+  State<SteamingCup> createState() => _SteamingCupState();
+}
+
+class _SteamingCupState extends State<SteamingCup> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return CustomPaint(
+          size: const Size(100, 100),
+          painter: SteamPainter(progress: _controller.value),
+        );
+      },
+    );
+  }
+}
+
+class SteamPainter extends CustomPainter {
+  final double progress;
+  SteamPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.accentGreen.withValues(alpha: 0.4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    // Cup
+    final cupPath = Path()
+      ..moveTo(size.width * 0.3, size.height * 0.7)
+      ..lineTo(size.width * 0.7, size.height * 0.7)
+      ..quadraticBezierTo(size.width * 0.7, size.height * 0.9, size.width * 0.5, size.height * 0.9)
+      ..quadraticBezierTo(size.width * 0.3, size.height * 0.9, size.width * 0.3, size.height * 0.7)
+      ..close();
+    
+    canvas.drawPath(cupPath, paint);
+    
+    // Steam
+    for (int i = 0; i < 3; i++) {
+      final p = (progress + (i * 0.33)) % 1.0;
+      final opacity = math.sin(p * math.pi) * 0.3;
+      final steamPaint = Paint()
+        ..color = Colors.white.withValues(alpha: opacity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5;
+
+      final xBase = size.width * 0.4 + (i * 10);
+      final yBase = size.height * 0.7;
+      final yOffset = p * 40;
+      final xAmoeba = math.sin(p * math.pi * 2) * 5;
+
+      final steamPath = Path()
+        ..moveTo(xBase, yBase - yOffset)
+        ..quadraticBezierTo(xBase + 5 + xAmoeba, yBase - yOffset - 10, xBase + xAmoeba, yBase - yOffset - 20);
+      
+      canvas.drawPath(steamPath, steamPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
